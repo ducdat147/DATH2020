@@ -1,0 +1,206 @@
+{% extends "pages/base.html" %} {% block title %} Đăng kí học {% endblock title %} {% block content %} {% load static %}
+<div class="card-header">
+    <h2 class="text-center font-weight-light"><b>Đăng ký thông tin học viên</b></h2>
+</div>
+<div class="card-body">
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- {{form}} -->
+        <div class="form-row">
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputName">Họ và tên</label>
+                <div class="form-group">
+                    <input class="form-control" name="fullname" required id="inputname" type="text"
+                        value="Trương Đức Đạt" placeholder="Nhập họ và tên" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputGender">Giới tính</label>
+                <div class="form-group">
+                    <select class="form-control" name="gender" required id="inputgender">
+                        <option value="1" hidden>Nam</option>
+                        {% for i in gender %}
+                        <option value="{{ i.pk }}">{{ i.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputBirthDay">Ngày sinh</label>
+                <div class="form-group">
+                    <input class="form-control" name="birthday" required id="inputbirthday" value="1998-01-18"
+                        type="date" />
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputEmail">Email</label>
+                <div class="form-group">
+                    <input class="form-control" name="email" required id="inputemail" type="email"
+                        value="ducdat147@gmail.com" placeholder="Nhập email học viên" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputIdentityCard">CMND/Thẻ căn cước</label>
+                <div class="form-group">
+                    <input class="form-control" name="identity_card" required id="inputidentitycard" type="text"
+                        value="123456789" placeholder="Nhập CMND học viên" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputPhone">Số điện thoại</label>
+                <div class="form-group">
+                    <input class="form-control" name="phonenumber" required id="inputphone" type="text"
+                        value="0358456611" placeholder="Nhập số điện thoại học viên" /></div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-8">
+                <label class="small mb-1" for="inputAddress">Địa chỉ</label>
+                <div class="form-group">
+                    <input class="form-control" name="adress" required id="inputaaddress" type="text"
+                        value="tp.Ho Chi Minh" placeholder="Nhập địa chỉ học viên " />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputPhone">Số điện thoại phụ huynh</label>
+                <div class="form-group">
+                    <input class="form-control" name="phonenumber_family" required id="inputphonefamily" type="text"
+                        value="0358456611" placeholder="Nhập số điện thoại phụ huynh" /></div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-4">
+                <label class="small mb-1" for="inputUnit">Khóa học</label>
+                <div class="form-group">
+                    <select onchange="changeUnitClassname(this.value)" class="form-control" id="id_unit" name="unit"
+                        required>
+                        {% for i in unit %}
+                        {% if i.active %}
+                        <option value="{{i.pk}}">{{i.fullname}}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="small mb-1" for="id_classname">Lớp</label>
+                <div class="form-group">
+                    <select class="form-control" id="id_classname" name="classname" required>
+                        <option value="" selected hidden>---</option>
+                        {% for i in classname %}
+                        {% if i.active == 0 %}
+                        {% if i.startdate >= today %}
+                        <option value="{{i.pk}}" data-option="{{i.unit_id}}">{{i.fullname}}</option>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="small mb-1" for="id_teacher">Giảng viên</label>
+                <div class="form-group">
+                    <select disabled class="form-control" id="id_teacher" required>
+                        <option value="" selected hidden>---</option>
+                        {% for i in classname %}
+                        {% if i.active == 0 %}
+                        <option value="{{i.pk}}" hidden>{{i.teacher}}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="small mb-1" for="inputFee">Số tiền nộp</label>
+                <div class="form-group input-group mb-3">
+                    <input class="form-control" name="fee" required id="inputfee" type="text" value="1000000"
+                        placeholder="Nhập số tiền mà học viên nộp vào đây" />
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">VND</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="small mb-1" for="inputFee">Số tiền phải đóng</label>
+                <div class="form-group input-group mb-3">
+
+                    <select class="form-control" disabled id="id_feeremain" required>
+                        {% for i in unit %}
+                        {% if i.active %}
+                        <option value="{{i.pk}}" hidden>{{i.fee}}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">VND</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <label class="small mb-1" for="inputNote">Ghi chú</label>
+                <div class="form-group">
+                    <input class="form-control" name="note" id="inputNote" type="text" placeholder="Ghi chú"
+                        value="cba" />
+
+                </div>
+            </div>
+            <div class="col-md-1">
+                <label class="small mb-1" for="inputActive">Trạng thái</label>
+                <div class="form-group">
+                    <input type="checkbox" disabled name="active" data-toggle="toggle" data-on="Học" data-off="Nghỉ"
+                        data-onstyle="success" data-offstyle="danger">
+
+                </div>
+            </div>
+        </div>
+        <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
+            <input onclick="submita()" type="submit" value="Thêm học viên" class="btn btn-primary"
+                style="margin-left: auto; margin-right: auto;">
+        </div>
+    </form>
+</div>
+<script src="{% static '/js/sweetalert.min.js' %}"></script>
+<script src="{% static '/js/moment.min.js' %}"></script>
+<script src="{% static '/js/jquery-3.4.1.min.js' %}"></script>
+
+<script>
+    function changeclassname() {
+        var x = document.getElementById("id_classname").value;
+        document.getElementById("id_teacher").value = x;
+    }
+    var id_unit = document.querySelector('#id_unit');
+    var id_classname = document.querySelector('#id_classname');
+    var options_unit_classname = id_classname.querySelectorAll('option');
+
+    function changeUnitClassname(selValue) {
+        id_classname.innerHTML = '';
+        for (var i = 0; i < options_unit_classname.length; i++) {
+            if (options_unit_classname[i].dataset.option === selValue) {
+                id_classname.appendChild(options_unit_classname[i]);
+            }
+        }
+        var x = document.getElementById("id_unit").value;
+        document.getElementById("id_feeremain").value = x;
+
+        var x = document.getElementById("id_classname").value;
+        document.getElementById("id_teacher").value = x;
+    }
+    changeUnitClassname(id_unit.value);
+</script>
+
+<script>
+    function submita() {
+        swal("Great!!!", "Đăng ký thành công", "success", {
+            buttons: false,
+            timer: 1500,
+        });
+        setTimeout(function () {
+            document.qrcodeRedirectForm.submit();
+        }, 1500);
+    }
+</script>
+{% endblock content %}

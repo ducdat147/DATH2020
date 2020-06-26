@@ -1,0 +1,197 @@
+{% extends "pages/base.html" %}
+<!-- break -->
+{% block title %}
+<!-- Student -->
+{% endblock title %}
+<!-- break -->
+{% block content %}
+<!-- break -->
+{% load static %}
+<!-- break -->
+<div class="card-header">
+    <h2 class="text-center font-weight-light">Thời khóa biểu cá nhân</h2>
+</div>
+<div class="col-md-12 row">
+    <div style="margin-left: auto; padding-bottom: 1em;">
+        <div>
+            <button name="print" onclick="printfail()" style="width: 8em;" type="button" class="btn btn-primary"><i
+                    class="fas fa-print"></i> In</button>
+        </div>
+    </div>
+</div>
+<div class="card-body">
+    <div class="form-row">
+        <div class="col-md-7">
+            <div class="card-body" style="margin:0 auto; width: 100%;">
+                <div id="calendar" style=" width: 100%; margin: 0 20px 20px 0;">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div>
+                <h2 class="text-center">Thông tin học viên</h2>
+            </div>
+            <div class="card-body" style="margin:0 auto; width: 100%;">
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>
+                            <h4>Họ và tên:</h4>
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label>
+                            <h4>{{ student.fullname }}</h4>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>
+                            <h4>Giới tính:</h4>
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label>
+                            <h4>{{ student.gender }}</h4>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>
+                            <h4>Ngày sinh:</h4>
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label>
+                            <h4>{{ student.birthday|date:"d-m-Y" }}</h4>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>
+                            <h4>Số điện thoại:</h4>
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label>
+                            <h4>{{ student.phonenumber }}</h4>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>
+                            <h4>Email:</h4>
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label>
+                            <h4>{{ student.email }}</h4>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>
+                            <h4>Địa chỉ:</h4>
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label>
+                            <h4>{{ student.adress }}</h4>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>
+                            <h4>Số gia đình:</h4>
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label>
+                            <h4>{{ student.phonenumber_family }}</h4>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {% if student.havedetailschedule %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-row">
+                        <a class="btn btn-primary" href="{% url 'liststudent'%}" role="button"
+                            style="margin-left: auto; margin-right: auto;" name="backliststudent"
+                            id="id_backliststudent">Danh sách sinh viên</a>
+                        <button class="btn btn-warning" type="submit" style="margin-left: auto; margin-right: auto;"
+                            name="submit" id="id_submit" value="">Xóa thời khóa biểu hiện tại</button>
+                        <!-- <input class="btn btn-warning" type="submit" style="margin-left: auto; margin-right: auto;"
+                                name="submit" id="id_submit" value="Xóa thời khóa biểu hiện tại"> -->
+                    </div>
+
+                </div>
+            </form>
+            {% else %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
+                    <input class="btn btn-danger" type="submit" style="margin-left: auto; margin-right: auto;"
+                        name="submit" id="id_submit" value="Xác nhận tạo thời khóa biểu cá nhân">
+                </div>
+            </form>
+            {%endif%}
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var initialLocaleCode = 'VI';
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: ['interaction', 'dayGrid'],
+            header: {
+                //left: 'prevYear,prev,next,nextYear today',
+                //center: 'title',
+                //right: 'dayGridMonth'
+                right: 'today prev,next',
+            },
+            defaultDate: '{{ classrequest.startdate|date:"Y-m-d" }}',
+            locale: initialLocaleCode,
+            navLinks: true, // can click day/week names to navigate views
+            //editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            events: [
+                {% for i in checkinclass %} 
+                {% if student.fullname == i.student %}
+                {
+            title: '{{ i.dayname }}',
+            start: '{{ i.daylearn|date:"Y-m-d" }}',
+            end: '{{ i.daylearn|date:"Y-m-d" }}',
+                {% if i.active == 1 %}
+    color: '#28a745',
+        {% else %}
+    color: '#bdbdbd'
+    {% endif %}
+                },
+    {% endif %}
+    {% endfor %}
+            ],
+        });
+    calendar.render();
+    });
+</script>
+<script>
+    function printfail() {
+        setTimeout(function () {
+            swal("Lỗi kết nối máy in", "Không có máy in kết nối", "error", {
+                buttons: false,
+                timer: 1500,
+            });
+        }, 3000);
+    }
+</script>
+<!-- break -->
+{% endblock content %}
