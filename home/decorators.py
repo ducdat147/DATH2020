@@ -9,7 +9,7 @@ from .models import *
 def unauthenticated_register(view_func):
     def wrapper_func(request, *args, **kwargs):
         a = User.objects.all().count()
-        if a > 1:
+        if a > 0:
             return redirect('login')
         if request.user.is_authenticated:
             return redirect('home')
@@ -20,7 +20,7 @@ def unauthenticated_register(view_func):
 def unauthenticated_login(view_func):
     def wrapper_func(request, *args, **kwargs):
         a = User.objects.all().count()
-        if a == 1:
+        if a == 0:
             return redirect('register')
         if request.user.is_authenticated:
             return redirect('home')
